@@ -1,0 +1,4 @@
+github.com/yaa110/go-persian-calendar v1.1.5 h1:EUipRRhzE6bR2NZaSyZ5BEOP46LGbUjzQgdC+Ivrbe4=
+github.com/yaa110/go-persian-calendar v1.1.5/go.mod h1:qtnmHCS9u1EiwzzSCSttGoxD5NfV9ZMzymxFCBYmqfg=
+golang.org/x/crypto v0.17.0 h1:r8bRNjWL3GshPW3gkd+RpvzWrZAwPS49OmTGZ/uhM4k=
+golang.org/x/crypto v0.17.0/go.mod h1:gCAAfMLgwOJRpTjQ2zCCt2OcSfYMTeZVSRtQlPC7Nq4=
