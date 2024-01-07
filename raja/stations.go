@@ -5,47 +5,34 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"os"
 	"strings"
 )
 
-func UpdateStationsJson() error {
+func GetStations() (*Stations, error) {
 	resp, err := Client.Get(BASE_URL + "/assets/File/station.json")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	body = bytes.TrimPrefix(body, []byte("\xef\xbb\xbf"))
-	fd, err := os.Create("./stations.json")
+	stations := &Stations{}
+	err = json.Unmarshal(body, stations)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer fd.Close()
-	_, err = fd.Write(body)
-	if err != nil {
-		return err
-	}
-	return nil
+	return stations, nil
 }
 
-func LoadStations() error {
-	data, _ := os.ReadFile("./stations.json")
-	err := json.Unmarshal(data, &Stations)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func FindStation(name string) (Station, error) {
-	for _, i := range Stations {
+// english name
+func (sts Stations) FindStationID(name string) (int, error) {
+	for _, i := range sts {
 		if strings.EqualFold(name, i.EnglishName) {
-			return i, nil
+			return i.Id, nil
 		}
 	}
-	return Station{}, errors.New("station \"" + name + "\" not found")
+	return -1, errors.New("station \"" + name + "\" not found")
 }
