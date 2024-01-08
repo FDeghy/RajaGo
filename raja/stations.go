@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -35,4 +36,14 @@ func (sts Stations) FindStationID(name string) (int, error) {
 		}
 	}
 	return -1, errors.New("station \"" + name + "\" not found")
+}
+
+// by id
+func (sts Stations) GetPersianName(id int) (string, error) {
+	for _, i := range sts {
+		if id == i.Id {
+			return i.PersianName, nil
+		}
+	}
+	return "", fmt.Errorf("station \"%d\" not found", id)
 }
