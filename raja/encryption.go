@@ -34,7 +34,7 @@ func GetPassword() ([]byte, error) {
 	return []byte(jsonXrs.Key), nil
 }
 
-func encrypt(input string, password []byte) (string, error) {
+func Encrypt(input string, password []byte) (Query, error) {
 	randSalt, err := randomBytes(16)
 	if err != nil {
 		return "", err
@@ -56,10 +56,10 @@ func encrypt(input string, password []byte) (string, error) {
 
 	result := appendByteSlices([][]byte{randSalt, randIV, encrypted})
 	b64Encoded := base64.StdEncoding.EncodeToString(result)
-	return b64Encoded, nil
+	return Query(b64Encoded), nil
 }
 
-func decrypt(input string, password []byte) (string, error) {
+func Decrypt(input string, password []byte) (string, error) {
 	b64Decoded, err := base64.StdEncoding.DecodeString(input)
 	if err != nil {
 		return "", err

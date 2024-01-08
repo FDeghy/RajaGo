@@ -1,10 +1,13 @@
 package raja
 
 import (
+	"net/http"
 	"time"
 
 	ptime "github.com/yaa110/go-persian-calendar"
 )
+
+type Query string
 
 type Stations []Station
 type Station struct {
@@ -88,4 +91,9 @@ type TrainInfo struct {
 	Source      Station
 	Destination Station
 	ShamsiDate  ptime.Time
+}
+
+type GetTrainListOpt struct {
+	HttpClient *http.Client
+	ApiKey     string
 }

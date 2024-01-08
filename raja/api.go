@@ -55,38 +55,43 @@ func GetApiKey() (string, error) {
 	return apiKey, nil
 }
 
-func GetTrainList(tinfo TrainInfo, apiKey string, password []byte) (TrainList, error) {
-	jsonTrains := new(TrainList)
-	q := tinfo.encode()
-	query, err := encrypt(q, password)
-	if err != nil {
-		return *jsonTrains, err
+func GetTrainList(tinfo TrainInfo, apiKey string, password []byte, query Query, opt *GetTrainListOpt) (*TrainList, error) {
+	if opt == nil {
+		ak, err := GetApiKey()
+		if err != nil {
+			return nil, err
+		}
+		opt = &GetTrainListOpt{
+			ApiKey:     ak,
+			HttpClient: &Client,
+		}
 	}
 
 	req, err := http.NewRequest("GET", SERVICE_URL+"/Api/ServiceProvider/TrainListEq", nil)
 	if err != nil {
-		return *jsonTrains, err
+		return nil, ErrGetTrains
 	}
 
 	req.Header.Set("api-key", apiKey)
 	req.Header.Set("User-Agent", USER_AGENT)
 	params := req.URL.Query()
-	params.Set("q", query)
+	params.Set("q", query.String())
 	req.URL.RawQuery = params.Encode()
 
 	resp, err := Client.Do(req)
 	if err != nil {
-		return *jsonTrains, fmt.Errorf("get train list error: %w", err)
+		return nil, ErrGetTrains
 	}
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return *jsonTrains, err
+		return nil, ErrGetTrains
 	}
+	jsonTrains := &TrainList{}
 	err = json.Unmarshal(data, &jsonTrains)
 	if err != nil {
-		return *jsonTrains, fmt.Errorf("decode json error: %w", err)
+		return nil, ErrGetTrainsDecode
 	}
 
-	return *jsonTrains, nil
+	return jsonTrains, nil
 }

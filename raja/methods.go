@@ -12,3 +12,7 @@ func (ti TrainInfo) encode() string {
 		ti.ShamsiDate.Format("yyyyMMdd"),
 	)
 }
+
+func (q Query) String() string {
+	return string(q)
+}

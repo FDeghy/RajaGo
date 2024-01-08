@@ -15,5 +15,4 @@ var (
 	Client = http.Client{
 		Timeout: 30 * time.Second,
 	}
-	Stations2 []Station
 )
