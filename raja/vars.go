@@ -1,6 +1,7 @@
 package raja
 
 import (
+	"crypto/tls"
 	"net/http"
 	"time"
 )
@@ -14,5 +15,8 @@ const (
 var (
 	Client = http.Client{
 		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
 	}
 )
