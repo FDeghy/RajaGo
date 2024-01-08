@@ -55,7 +55,7 @@ func GetApiKey() (string, error) {
 	return apiKey, nil
 }
 
-func GetTrainList(tinfo TrainInfo, apiKey string, password []byte, query Query, opt *GetTrainListOpt) (*TrainList, error) {
+func GetTrainList(query Query, opt *GetTrainListOpt) (*TrainList, error) {
 	if opt == nil {
 		ak, err := GetApiKey()
 		if err != nil {
@@ -72,7 +72,7 @@ func GetTrainList(tinfo TrainInfo, apiKey string, password []byte, query Query, 
 		return nil, ErrGetTrains
 	}
 
-	req.Header.Set("api-key", apiKey)
+	req.Header.Set("api-key", opt.ApiKey)
 	req.Header.Set("User-Agent", USER_AGENT)
 	params := req.URL.Query()
 	params.Set("q", query.String())
