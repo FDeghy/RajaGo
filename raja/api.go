@@ -82,6 +82,11 @@ func GetTrainList(query Query, opt *GetTrainListOpt) (*TrainList, error) {
 	if err != nil {
 		return nil, ErrGetTrains
 	}
+	if resp.StatusCode == 400 {
+		return nil, ErrTrainsNotFound
+	} else if resp.StatusCode != 200 {
+		return nil, ErrBadStatus
+	}
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
