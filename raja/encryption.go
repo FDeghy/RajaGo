@@ -10,13 +10,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 
 	"golang.org/x/crypto/pbkdf2"
 )
 
 func GetPassword() ([]byte, error) {
-	jsonXrs := new(xrs)
-	resp, err := Client.Get(BASE_URL + "/assets/File/xrs.json")
+	jsonXrs := &xrs{}
+
+	req, _ := http.NewRequest(
+		http.MethodGet,
+		BASE_URL+"/assets/File/xrs.json",
+		nil,
+	)
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0")
+
+	resp, err := Client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("get xrs error: %w", err)
 	}

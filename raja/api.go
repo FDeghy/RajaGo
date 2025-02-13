@@ -12,7 +12,14 @@ import (
 func GetApiKey() (string, error) {
 	var jsName, apiKey string
 
-	resp, err := Client.Get(BASE_URL)
+	req, _ := http.NewRequest(
+		http.MethodGet,
+		BASE_URL,
+		nil,
+	)
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0")
+
+	resp, err := Client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("get base error: %w", err)
 	}
@@ -32,26 +39,44 @@ func GetApiKey() (string, error) {
 		return "", errors.New("js not found")
 	}
 
-	resp, err = Client.Get(BASE_URL + "/" + jsName)
-	if err != nil {
-		return "", fmt.Errorf("get js file error: %w", err)
-	}
-	body, err = io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("read js file error: %w", err)
-	}
-	defer resp.Body.Close()
+	req, _ = http.NewRequest(
+		http.MethodGet,
+		BASE_URL+"/"+jsName,
+		nil,
+	)
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0")
 
-	re, err = regexp.Compile("\"api-key\":\"([^\"]+)\"")
-	if err != nil {
-		return "", fmt.Errorf("\"api-key\" regex compile error: %w", err)
-	}
-	if match := re.FindStringSubmatch(string(body)); match != nil {
-		apiKey = match[1]
-	} else {
-		return "", errors.New("api-key not found")
-	}
+	for fail := 0; ; fail++ {
+		resp, err = Client.Do(req)
+		if err != nil {
+			if fail > 3 {
+				return "", fmt.Errorf("get js file error: %w", err)
+			}
+			continue
+		}
+		body, err = io.ReadAll(resp.Body)
+		if err != nil {
+			if fail > 3 {
+				return "", fmt.Errorf("read js file error: %w", err)
+			}
+			continue
+		}
+		defer resp.Body.Close()
 
+		re, err = regexp.Compile("\"api-key\":\"([^\"]+)\"")
+		if err != nil {
+			return "", fmt.Errorf("\"api-key\" regex compile error: %w", err)
+		}
+		if match := re.FindStringSubmatch(string(body)); match != nil {
+			apiKey = match[1]
+			break
+		} else {
+			if fail > 3 {
+				return "", errors.New("api-key not found")
+			}
+			continue
+		}
+	}
 	return apiKey, nil
 }
 

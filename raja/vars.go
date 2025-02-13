@@ -3,6 +3,7 @@ package raja
 import (
 	"crypto/tls"
 	"net/http"
+	"net/http/cookiejar"
 	"time"
 )
 
@@ -13,10 +14,12 @@ const (
 )
 
 var (
+	jar, _ = cookiejar.New(nil)
 	Client = http.Client{
 		Timeout: 30 * time.Second,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
+		Jar: jar,
 	}
 )
